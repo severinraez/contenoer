@@ -29,7 +29,7 @@ func main() {
 		name, path := arguments.Parameters[0], arguments.Parameters[1]
 
 		session, err := inventory.Add(session, name, path)
-		exitOnErr(err)
+		exitOnError(err)
 
 		saveSession(arguments.SessionFile, session)
 	} else {
@@ -45,7 +45,7 @@ func usage(description string, parameterCount int, parameters []string) {
 	}
 }
 
-func exitOnErr(err error) {
+func exitOnError(err error) {
 	if err == nil { return }
 
 	fmt.Println("Error, aborting: %v", err)
@@ -69,10 +69,10 @@ func loadSession(sessionFile string) inventory.Inventory {
 
 	if err == nil {
 		contents, err := ioutil.ReadFile(sessionFile)
-		exitOnErr(err)
+		exitOnError(err)
 
 		session, err := inventory.Deserialize(contents)
-		exitOnErr(err)
+		exitOnError(err)
 
 		return session
 	}
@@ -84,8 +84,8 @@ func loadSession(sessionFile string) inventory.Inventory {
 
 func saveSession(sessionFile string, session inventory.Inventory) {
 	content, err := inventory.Serialize(session)
-	exitOnErr(err)
+	exitOnError(err)
 
 	err = ioutil.WriteFile(sessionFile, content, 0644)
-	exitOnErr(err)
+	exitOnError(err)
 }
