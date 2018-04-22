@@ -4,11 +4,17 @@ services:
     image: "golang"
     volumes:
       - ./src:/go/src/github.com/severinraez/contenoer
+
       - ./bin:/go/bin
       - ./pkg:/go/pkg
+
+      - ./go-src:/go/src
       - ./go-cache:/go/cache
+      - ./go-misc:/opt/misc
     ports:
       - "3000:3000"
     environment:
       - GOCACHE=/go/cache
+
+      - HISTFILE=/opt/misc/history
     user: "${USERID}:${GROUPID}"
