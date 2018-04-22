@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-type inventory struct {
+type Inventory struct {
 	Bundles []composefile
 }
 
@@ -19,13 +19,13 @@ type composefile struct {
 }
 
 
-func Add(i inventory, name string, path string) (inventory, error){
+func Add(i Inventory, name string, path string) (Inventory, error){
 	if ! isDockerfile(path) {
 		err := errors.New(fmt.Sprintf("No Dockerfile at %s", path))
-		return inventory{}, err
+		return Inventory{}, err
 	}
 
-	result := inventory{}
+	result := Inventory{}
 	copier.Copy(&result, &i)
 
 	absPath, _ := filepath.Abs(path)
@@ -40,7 +40,7 @@ func Add(i inventory, name string, path string) (inventory, error){
 	return result, nil
 }
 
-func BundleNames(i inventory) []string {
+func BundleNames(i Inventory) []string {
 	var names []string
 	for _, bundle := range i.Bundles {
 		names = append(names, bundle.Name)
@@ -48,11 +48,11 @@ func BundleNames(i inventory) []string {
 	return names
 }
 
-func New() inventory {
-	return inventory{}
+func New() Inventory {
+	return Inventory{}
 }
 
-func Serialize(i inventory) ([]byte, error) {
+func Serialize(i Inventory) ([]byte, error) {
 	json, err := json.Marshal(i)
 	if err != nil {
 		return []byte{}, err
@@ -61,8 +61,8 @@ func Serialize(i inventory) ([]byte, error) {
 	return json, nil
 }
 
-func Deserialize(jsonBlob []byte) (inventory, error) {
-	i := inventory{}
+func Deserialize(jsonBlob []byte) (Inventory, error) {
+	i := Inventory{}
 	err := json.Unmarshal(jsonBlob, &i)
 
 	return i, err
