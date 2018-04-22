@@ -1,0 +1,14 @@
+version: '3'
+services:
+  go:
+    image: "golang"
+    volumes:
+      - ./src:/go/src/github.com/severinraez/contenoer
+      - ./bin:/go/bin
+      - ./pkg:/go/pkg
+      - ./go-cache:/go/cache
+    ports:
+      - "3000:3000"
+    environment:
+      - GOCACHE=/go/cache
+    user: "${USERID}:${GROUPID}"
