@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/severinraez/cotenoer/hud"
-	"github.com/severinraez/cotenoer/inventory"
+	// "github.com/severinraez/cotenoer/inventory"
 )
 
 func main() {

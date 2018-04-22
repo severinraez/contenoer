@@ -2,10 +2,17 @@ package inventory
 
 import (
 	"testing"
-	"reflect"
-//	"fmt"
 	"os"
+	. "github.com/severinraez/cotenoer/testhelper"
 )
+
+func TestNew(t *testing.T) {
+	i := New()
+
+	bundles := BundleNames(i)
+
+	AssertEqual(len(bundles), 0, t)
+}
 
 func TestAdd(t *testing.T) {
 	i := New()
@@ -15,24 +22,38 @@ func TestAdd(t *testing.T) {
 
 	i, err := Add(i, "name", path)
 
-	if err != nil {
-		t.Errorf("Error: %v", err)
-	}
+	AssertEqual(err, nil, t)
 
 	want := []string{"name"}
 	got := BundleNames(i)
 
-	if ! reflect.DeepEqual(want, got) {
-		t.Errorf("Want %v, got %v", want, got)
-	}
+	AssertEqual(got, want, t)
 }
 
-func TestNew(t *testing.T) {
-	i := New()
+func fakeInventory() inventory {
+	path := "/tmp/composefile"
+	os.Create(path)
 
-	bundles := BundleNames(i)
+	i, _ := Add(New(), "name", path)
+	return i
+}
 
-	if len(bundles) != 0 {
-		t.Errorf("Bundles not empty: %v", bundles)
-	}
+func TestSerialize(t *testing.T) {
+	i := fakeInventory()
+
+	got, err := Serialize(i)
+	want := []byte("{\"Bundles\":[{\"Path\":\"/tmp/composefile\",\"Name\":\"name\"}]}")
+
+	AssertEqual(err, nil, t)
+	AssertEqual(got, want, t)
+}
+
+func TestDeserialize(t *testing.T) {
+	serialized := []byte("{\"Bundles\":[{\"Path\":\"/tmp/composefile\",\"Name\":\"name\"}]}")
+
+	got, err := Deserialize(serialized)
+	want := fakeInventory()
+
+	AssertEqual(err, nil, t)
+	AssertEqual(got, want, t)
 }

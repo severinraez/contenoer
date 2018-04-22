@@ -10,13 +10,14 @@ import (
 )
 
 type inventory struct {
-	bundles []composefile
+	Bundles []composefile
 }
 
 type composefile struct {
-	path string
-	name string
+	Path string
+	Name string
 }
+
 
 func Add(i inventory, name string, path string) (inventory, error){
 	if ! isDockerfile(path) {
@@ -30,19 +31,19 @@ func Add(i inventory, name string, path string) (inventory, error){
 	absPath, _ := filepath.Abs(path)
 
 	composeFile := composefile{
-		path: absPath,
-		name: name}
+		Path: absPath,
+		Name: name}
 
-	result.bundles = append(
-		result.bundles, composeFile)
+	result.Bundles = append(
+		result.Bundles, composeFile)
 
 	return result, nil
 }
 
 func BundleNames(i inventory) []string {
 	var names []string
-	for _, bundle := range i.bundles {
-		names = append(names, bundle.name)
+	for _, bundle := range i.Bundles {
+		names = append(names, bundle.Name)
 	}
 	return names
 }
@@ -51,17 +52,20 @@ func New() inventory {
 	return inventory{}
 }
 
-func Serialize(i inventory) []byte {
-	json, _ := json.Marshal(i)
+func Serialize(i inventory) ([]byte, error) {
+	json, err := json.Marshal(i)
+	if err != nil {
+		return []byte{}, err
+	}
 
-	return json
+	return json, nil
 }
 
-func Deserialize(jsonBlob []byte) inventory {
+func Deserialize(jsonBlob []byte) (inventory, error) {
 	i := inventory{}
-	json.Unmarshal(jsonBlob, &i)
+	err := json.Unmarshal(jsonBlob, &i)
 
-	return i
+	return i, err
 }
 
 func isDockerfile(path string) bool {
