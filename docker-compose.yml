@@ -3,7 +3,7 @@ services:
   go:
     image: "golang"
     volumes:
-      - ./src:/go/src/github.com/severinraez/contenoer
+      - ./src:/go/src/github.com/severinraez/cotenoer
 
       - ./bin:/go/bin
 
