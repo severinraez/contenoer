@@ -1,0 +1,20 @@
+export COTENOER_SESSION=$(mktmp)
+
+cotenör add test docker-compose.yaml
+
+cotenör cd test
+
+cotenör +ruby, wait
+
+cotenör run ruby time rake test
+
+cotenör volume add build-artefacts
+
+cotenör +bundle-install, +yard-run -> +npm-build, wait
+
+cotenör cp bundle-install:/opt/rvm/gems -> build-artefacts:/app, \
+        cp npm-build:/opt/build/node_modules -> build-artefacts:/frontend
+
+cotenör build rails with volumes build-artefacts:/app -> /opt/rvm/gems, wait
+
+cotenör hud

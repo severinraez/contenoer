@@ -1,0 +1,33 @@
+                             
+                    %             
+
+    0.3 Cores      20
+    5 Gi RAM      5.4
+
+    -   -   -   -   -                        compose bundles
+    -   -   -   -                                            _
+    -   -   -   -                               1 Test    2 [_]  |-   |
+    _   -   -   #                                            _
+    #   -   #   #                               2 Prod    3 [_]  |--  |
+    #   #   #   #                                            _
+    #   #   #   #                     o-->      3 Build   5 [_]  |###-|
+    =   =   =   =   =
+    _   _   _   _   _
+   [_] [_] [_] [_] [v]  5 Cotenörs                hint: use arrow keys.
+
+    ^                          < rails >  bundle-install  gulp
+    |                            nginx    database        N none   
+    |______________________________________________________________________
+       _                                                                    
+      [_]  bundle-install      |    Volumes
+                               |
+      S Stop                   |    /opt/src :: from ~/dev/.../project
+      K Force Stop             |
+                               |
+      R Restart                |    Communication
+                               |                _
+      D Stop, delete           |    host       [_]
+        container              |
+                               |    8080  <->  8080
+      C Console   L Logs       |    8081  <->  7080
+    _______________________________________________________________________
