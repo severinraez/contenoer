@@ -30,7 +30,7 @@ func Start() {
 	defer termbox.Close()
 	termbox.SetInputMode(termbox.InputEsc)
 	reallocBackBuffer(termbox.Size())
-	update_and_redraw(-1, -1)
+	updateAndRedraw(-1, -1)
 
 mainloop:
 	for {
@@ -43,11 +43,11 @@ mainloop:
 		case termbox.EventResize:
 			reallocBackBuffer(ev.Width, ev.Height)
 		}
-		update_and_redraw(mx, my)
+		updateAndRedraw(mx, my)
 	}
 }
 
-func update_and_redraw(mx, my int) {
+func updateAndRedraw(mx, my int) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 	backbuf[0] = termbox.Cell{Ch: 'a', Fg: termbox.ColorWhite}
 	if mx != -1 && my != -1 {

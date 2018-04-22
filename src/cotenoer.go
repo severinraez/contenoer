@@ -11,7 +11,7 @@ func main() {
 	if len(argsWithoutProg) > 0 && argsWithoutProg[0] == "hud" {
 		hud.Start()
 	} else {
-	  fmt.Println(argsWithoutProg)
-          os.Exit(0)
+		fmt.Println(argsWithoutProg)
+		os.Exit(0)
 	}
 }
