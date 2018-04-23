@@ -5,6 +5,8 @@ import (
 	"github.com/nsf/termbox-go"
 	"github.com/severinraez/cotenoer/inventory"
 	"github.com/severinraez/cotenoer/bundle"
+	"fmt"
+	"errors"
 )
 
 
@@ -34,16 +36,25 @@ type consoleEvent struct {
 
 type state struct {
 	SelectedBundleName string
+	BundleOverviews []bundle.Overview
 }
 
-func Start(session inventory.Inventory) {
+// @return the exit code
+func Run(session inventory.Inventory) int {
+	state, err := initState(session)
+
+	if err != nil {
+		fmt.Printf("Could not initialize HUD.\nCause: %v\n", err)
+		return 1
+	}
+
 	initTermbox()
 	defer teardownTermbox()
 
 	reallocBackBuffer(termbox.Size())
-	updateAndRedraw(-1, -1)
 
-	//state := initState(session) 
+	draw(state)
+
 	consoleEvents := make(chan consoleEvent)
 	bundleOverview := make(chan []bundle.Overview)
 
@@ -58,15 +69,26 @@ mainloop:
 			if isExitEvent {
 				break mainloop
 			}
-		//case bundleOverviews := <- bundleOverview:
-		// 	bundleOverviews
+		case bundleOverviews := <- bundleOverview:
+			 	state.BundleOverviews = bundleOverviews
+
+			draw(state)
 		}
 	}
+
+	return 0
 }
 
-func initState(session inventory.Inventory) state {
+func initState(session inventory.Inventory) (state, error) {
+	bundles := inventory.BundleNames(session)
+
+	if len(bundles) == 0 {
+		return state{}, errors.New("No bundles configured. Did you forget to add any or is COTENOER_SESSION not set correctly?")
+	}
+
 	return state{
-		SelectedBundleName: inventory.BundleNames(session)[0]}
+		BundleOverviews: []bundle.Overview{},
+		SelectedBundleName: bundles[0]}, nil
 }
 
 func handleConsoleEvent(event consoleEvent) bool {
@@ -78,7 +100,6 @@ func handleConsoleEvent(event consoleEvent) bool {
 	case "resize":
 		reallocBackBuffer(event.ResizeWidth, event.ResizeHeight)
 	}
-	updateAndRedraw(-1, -1)
 	return false
 }
 
@@ -115,15 +136,25 @@ func teardownTermbox() {
 	termbox.Close()
 }
 
-func updateAndRedraw(mx, my int) {
+func draw(state state) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+
+	//drawBundles(state.BundleOverviews)
+
 	backbuf[0] = termbox.Cell{Ch: 'a', Fg: termbox.ColorWhite}
-	if mx != -1 && my != -1 {
-		backbuf[bbw*my+mx] = termbox.Cell{Ch: runes[0], Fg: colors[0]}
-	}
+
 	copy(termbox.CellBuffer(), backbuf)
 	//_, h := termbox.Size()
 	termbox.Flush()
+}
+
+func copyRect(dest []termbox.Cell, destW int, x int, y int, src []termbox.Cell, srcW int, srcH int) {
+	for i := 0; i < srcW; i++ {
+		for j := 0; j < srcH; j++ {
+			fmt.Printf("%v %v %v %v -> %v\n", x, y, i ,j, (x + i) + (y + j) * destW)
+			dest[(x + i) + (y + j) * destW] = src[i + j * srcW]
+		}
+	}
 }
 
 func reallocBackBuffer(w, h int) {

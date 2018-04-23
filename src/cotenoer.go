@@ -22,7 +22,8 @@ func main() {
 	if arguments.Command == "hud" {
 		session := loadSession(arguments.SessionFile)
 
-		hud.Start(session)
+		exitCode := hud.Run(session)
+		os.Exit(exitCode)
 	} else if arguments.Command == "add" {
 		session := loadSession(arguments.SessionFile)
 

@@ -18,3 +18,4 @@ services:
 
       - HISTFILE=/opt/misc/history
     user: "${USERID}:${GROUPID}"
+    working_dir: /go/src/github.com/severinraez/cotenoer/

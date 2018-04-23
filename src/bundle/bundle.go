@@ -4,7 +4,6 @@ import (
 	"github.com/severinraez/cotenoer/inventory"
 	"os/exec"
 	"strings"
-	"log"
 )
 
 
