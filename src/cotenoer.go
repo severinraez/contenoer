@@ -37,9 +37,8 @@ func main() {
 
 		usage("list", 0, arguments.Parameters)
 
-		fmt.Printf("Bundles: \n")
 		for _, bundle := range inventory.BundleNames(session) {
-			fmt.Printf("* %s\n", bundle)
+			fmt.Printf("%s\n", bundle)
 		}
 	} else {
 		fmt.Printf("Don't know what to do. Orders: %+v\n", arguments)
