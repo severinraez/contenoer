@@ -10,11 +10,11 @@ import (
 )
 
 type Inventory struct {
-	Bundles map[string]composefile
+	Bundles map[string]Bundle
 }
 
-type composefile struct {
-	Path string
+type Bundle struct {
+	ComposeFilePath string
 	Name string
 }
 
@@ -30,13 +30,21 @@ func Add(i Inventory, name string, path string) (Inventory, error){
 
 	absPath, _ := filepath.Abs(path)
 
-	composeFile := composefile{
-		Path: absPath,
+	bundle := Bundle{
+		ComposeFilePath: absPath,
 		Name: name}
 
-	result.Bundles[name] = composeFile
+	result.Bundles[name] = bundle
 
 	return result, nil
+}
+
+func Bundles(i Inventory) []Bundle {
+	var bundles []Bundle
+	for _, bundle := range i.Bundles {
+		bundles = append(bundles, bundle)
+	}
+	return bundles
 }
 
 func BundleNames(i Inventory) []string {
@@ -49,7 +57,7 @@ func BundleNames(i Inventory) []string {
 
 func New() Inventory {
 	return Inventory{
-		Bundles: make(map[string]composefile)}
+		Bundles: make(map[string]Bundle)}
 }
 
 func Serialize(i Inventory) ([]byte, error) {
