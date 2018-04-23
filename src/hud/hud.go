@@ -23,7 +23,7 @@ var colors = []termbox.Attribute{
 
 type attrFunc func(int) (rune, termbox.Attribute, termbox.Attribute)
 
-type event struct {
+type consoleEvent struct {
 	Kind string
 	Key string
 	ResizeWidth int
@@ -31,53 +31,72 @@ type event struct {
 }
 
 func Start(session inventory.Inventory) {
-	err := termbox.Init()
-	if err != nil {
-		panic(err)
-	}
-	defer termbox.Close()
-	termbox.SetInputMode(termbox.InputEsc)
+	initTermbox()
+	defer teardownTermbox()
+
 	reallocBackBuffer(termbox.Size())
 	updateAndRedraw(-1, -1)
 
-	events := make(chan event)
+	consoleEvents := make(chan consoleEvent)
 
-	go pollEvents(events)
+	go pollConsole(consoleEvents)
 
 mainloop:
 	for {
-		event := <- events
-
-		switch event.Kind {
-		case "key":
-			if event.Key == "esc" {
+		select {
+		case event := <- consoleEvents:
+			isExitEvent := handleConsoleEvent(event)
+			if isExitEvent {
 				break mainloop
 			}
-		case "resize":
-			reallocBackBuffer(event.ResizeWidth, event.ResizeHeight)
 		}
-		updateAndRedraw(-1, -1)
 	}
 }
 
-func pollEvents(channel chan<- event) {
+func handleConsoleEvent(event consoleEvent) bool {
+	switch event.Kind {
+	case "key":
+		if event.Key == "esc" {
+			return true
+		}
+	case "resize":
+		reallocBackBuffer(event.ResizeWidth, event.ResizeHeight)
+	}
+	updateAndRedraw(-1, -1)
+	return false
+}
+
+func pollConsole(channel chan<- consoleEvent) {
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
 			if ev.Key == termbox.KeyEsc {
-				channel <- event{
+				channel <- consoleEvent{
 					Kind: "key",
 					Key: "esc"}
 				return
 			}
 		case termbox.EventResize:
-			channel <- event{
+			channel <- consoleEvent{
 				Kind: "resize",
 				ResizeWidth: ev.Width,
 				ResizeHeight: ev.Height}
 		}
 
 	}
+}
+
+func initTermbox() {
+	err := termbox.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	termbox.SetInputMode(termbox.InputEsc)
+}
+
+func teardownTermbox() {
+	termbox.Close()
 }
 
 func updateAndRedraw(mx, my int) {
