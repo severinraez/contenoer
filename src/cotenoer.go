@@ -20,7 +20,9 @@ func main() {
 	arguments := parseArguments(os.Args[1:], os.Getenv(sessionEnvVar))
 
 	if arguments.Command == "hud" {
-		hud.Start()
+		session := loadSession(arguments.SessionFile)
+
+		hud.Start(session)
 	} else if arguments.Command == "add" {
 		session := loadSession(arguments.SessionFile)
 

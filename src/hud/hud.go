@@ -2,6 +2,7 @@ package hud
 
 import (
 	"github.com/nsf/termbox-go"
+	"github.com/severinraez/cotenoer/inventory"
 )
 
 
@@ -22,7 +23,14 @@ var colors = []termbox.Attribute{
 
 type attrFunc func(int) (rune, termbox.Attribute, termbox.Attribute)
 
-func Start() {
+type event struct {
+	Kind string
+	Key string
+	ResizeWidth int
+	ResizeHeight int
+}
+
+func Start(session inventory.Inventory) {
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
@@ -32,18 +40,43 @@ func Start() {
 	reallocBackBuffer(termbox.Size())
 	updateAndRedraw(-1, -1)
 
+	events := make(chan event)
+
+	go pollEvents(events)
+
 mainloop:
 	for {
-		mx, my := -1, -1
+		event := <- events
+
+		switch event.Kind {
+		case "key":
+			if event.Key == "esc" {
+				break mainloop
+			}
+		case "resize":
+			reallocBackBuffer(event.ResizeWidth, event.ResizeHeight)
+		}
+		updateAndRedraw(-1, -1)
+	}
+}
+
+func pollEvents(channel chan<- event) {
+	for {
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
 			if ev.Key == termbox.KeyEsc {
-				break mainloop
+				channel <- event{
+					Kind: "key",
+					Key: "esc"}
+				return
 			}
 		case termbox.EventResize:
-			reallocBackBuffer(ev.Width, ev.Height)
+			channel <- event{
+				Kind: "resize",
+				ResizeWidth: ev.Width,
+				ResizeHeight: ev.Height}
 		}
-		updateAndRedraw(mx, my)
+
 	}
 }
 
