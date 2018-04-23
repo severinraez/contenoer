@@ -32,6 +32,15 @@ func main() {
 		exitOnError(err)
 
 		saveSession(arguments.SessionFile, session)
+	} else if arguments.Command == "list" {
+		session := loadSession(arguments.SessionFile)
+
+		usage("list", 0, arguments.Parameters)
+
+		fmt.Printf("Bundles: \n")
+		for _, bundle := range inventory.BundleNames(session) {
+			fmt.Printf("* %s\n", bundle)
+		}
 	} else {
 		fmt.Printf("Don't know what to do. Orders: %+v\n", arguments)
 		os.Exit(1)
@@ -48,7 +57,7 @@ func usage(description string, parameterCount int, parameters []string) {
 func exitOnError(err error) {
 	if err == nil { return }
 
-	fmt.Println("Error, aborting: %v", err)
+	fmt.Printf("Error, aborting: %v\n", err)
 	os.Exit(2)
 }
 
@@ -71,14 +80,22 @@ func loadSession(sessionFile string) inventory.Inventory {
 		contents, err := ioutil.ReadFile(sessionFile)
 		exitOnError(err)
 
+		if len(contents) == 0 {
+			return newSession()
+		}
+
 		session, err := inventory.Deserialize(contents)
 		exitOnError(err)
 
 		return session
 	}
 
-	fmt.Println("Initializing new Session at %s", sessionFile)
+	fmt.Printf("Initializing new Session at %s\n", sessionFile)
 
+	return newSession()
+}
+
+func newSession() inventory.Inventory {
 	return inventory.New()
 }
 

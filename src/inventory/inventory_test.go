@@ -30,7 +30,7 @@ func TestAdd(t *testing.T) {
 	AssertEqual(got, want, t)
 }
 
-func fakeInventory() inventory {
+func fakeInventory() Inventory {
 	path := "/tmp/composefile"
 	os.Create(path)
 
@@ -42,14 +42,14 @@ func TestSerialize(t *testing.T) {
 	i := fakeInventory()
 
 	got, err := Serialize(i)
-	want := []byte("{\"Bundles\":[{\"Path\":\"/tmp/composefile\",\"Name\":\"name\"}]}")
+	want := []byte("{\"Bundles\":{\"name\":{\"Path\":\"/tmp/composefile\",\"Name\":\"name\"}}}")
 
 	AssertEqual(err, nil, t)
-	AssertEqual(got, want, t)
+	AssertEqual(string(got), string(want), t)
 }
 
 func TestDeserialize(t *testing.T) {
-	serialized := []byte("{\"Bundles\":[{\"Path\":\"/tmp/composefile\",\"Name\":\"name\"}]}")
+	serialized := []byte("{\"Bundles\":{\"name\":{\"Path\":\"/tmp/composefile\",\"Name\":\"name\"}}}")
 
 	got, err := Deserialize(serialized)
 	want := fakeInventory()

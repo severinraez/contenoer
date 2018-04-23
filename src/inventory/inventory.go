@@ -10,7 +10,7 @@ import (
 )
 
 type Inventory struct {
-	Bundles []composefile
+	Bundles map[string]composefile
 }
 
 type composefile struct {
@@ -34,8 +34,7 @@ func Add(i Inventory, name string, path string) (Inventory, error){
 		Path: absPath,
 		Name: name}
 
-	result.Bundles = append(
-		result.Bundles, composeFile)
+	result.Bundles[name] = composeFile
 
 	return result, nil
 }
@@ -49,7 +48,8 @@ func BundleNames(i Inventory) []string {
 }
 
 func New() Inventory {
-	return Inventory{}
+	return Inventory{
+		Bundles: make(map[string]composefile)}
 }
 
 func Serialize(i Inventory) ([]byte, error) {
