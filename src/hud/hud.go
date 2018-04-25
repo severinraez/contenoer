@@ -139,7 +139,10 @@ func teardownTermbox() {
 func draw(state state) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-	//drawBundles(state.BundleOverviews)
+	bundles, bundlesW := linesToRect(bundleView(state.BundleOverviews))
+	if len(bundles) > 0 {
+		copyRect(backbuf, bbw, 5, 5, bundles, bundlesW)
+	}
 
 	backbuf[0] = termbox.Cell{Ch: 'a', Fg: termbox.ColorWhite}
 
@@ -148,10 +151,42 @@ func draw(state state) {
 	termbox.Flush()
 }
 
-func copyRect(dest []termbox.Cell, destW int, x int, y int, src []termbox.Cell, srcW int, srcH int) {
+func bundleView(bundles []bundle.Overview) []string {
+	view := []string{};
+	for i, bundle := range bundles {
+		view = append(
+			view,
+			fmt.Sprintf("%d %s - %d [_]", i, bundle.Name, bundle.ActiveContainers))
+	}
+	return view
+}
+
+// @return ([]cells, width)
+func linesToRect(lines []string) ([]termbox.Cell, int) {
+	width := 0
+	for _, line := range lines {
+		lineWidth := len(line)
+		if lineWidth > width {
+			width = lineWidth
+		}
+	}
+
+	cells := make([]termbox.Cell, len(lines) * width)
+	for i, line := range lines {
+		baseIndex := i * width
+
+		for j, charCode := range line {
+			cells[baseIndex + j] = termbox.Cell{Ch: rune(charCode)}
+		}
+	}
+
+	return cells, width
+}
+
+func copyRect(dest []termbox.Cell, destW int, x int, y int, src []termbox.Cell, srcW int) {
+	srcH := len(src) / srcW
 	for i := 0; i < srcW; i++ {
 		for j := 0; j < srcH; j++ {
-			fmt.Printf("%v %v %v %v -> %v\n", x, y, i ,j, (x + i) + (y + j) * destW)
 			dest[(x + i) + (y + j) * destW] = src[i + j * srcW]
 		}
 	}

@@ -15,10 +15,11 @@ type Overview struct {
 func GetOverview(bundle inventory.Bundle) Overview {
 	psCmd := exec.Command("docker-compose", "-f", bundle.ComposeFilePath, "ps", "-q")
 
- 	output, err := psCmd.CombinedOutput()
+	// output, err := psCmd.CombinedOutput()
+	output, err := psCmd.Output()
 	panicOnError(err)
 
-	containerCount := len(strings.Split(string(output), "\n"))
+	containerCount := len(strings.Split(string(output), "\n")) - 1
 
 	return Overview{
 		Name: bundle.Name,

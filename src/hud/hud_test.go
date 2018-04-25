@@ -17,11 +17,7 @@ func TestCopyRect(t *testing.T) {
 	quad[2].Ch = 'c'
 	quad[3].Ch = 'd'
 
-	t.Log(canvas)
-
-	copyRect(canvas, w, 3, 3, quad, quadW, quadH)
-
-	t.Log(canvas)
+	copyRect(canvas, w, 3, 3, quad, quadW)
 
 	AssertEqual(canvas[0].Ch, rune(0), t)
 
@@ -33,5 +29,23 @@ func TestCopyRect(t *testing.T) {
 
 	quad2InCanvas := 3 + 4 * w
 	AssertEqual(canvas[quad2InCanvas].Ch, 'c', t)
+}
+
+func TestLinesToRect(t *testing.T) {
+	lines := []string{"", "a", "ab"}
+
+	cells, rectWidth := linesToRect(lines)
+
+	AssertEqualH(2 * 3, len(cells), "Cell array length", t)
+	AssertEqualH(2, rectWidth, "Rect width", t)
+
+	t.Log(cells)
+	empty := rune(0)
+	AssertEqual(cells[0].Ch, empty, t)
+	AssertEqual(cells[1].Ch, empty, t)
+	AssertEqual(cells[2].Ch, 'a', t)
+	AssertEqual(cells[3].Ch, empty, t)
+	AssertEqual(cells[4].Ch, 'a', t)
+	AssertEqual(cells[5].Ch, 'b', t)
 }
 
