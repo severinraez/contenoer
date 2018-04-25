@@ -39,7 +39,6 @@ func TestLinesToRect(t *testing.T) {
 	AssertEqualH(2 * 3, len(cells), "Cell array length", t)
 	AssertEqualH(2, rectWidth, "Rect width", t)
 
-	t.Log(cells)
 	empty := rune(0)
 	AssertEqual(cells[0].Ch, empty, t)
 	AssertEqual(cells[1].Ch, empty, t)
