@@ -1,0 +1,6 @@
+version: '3'
+services:
+  busybox:
+    image: busybox
+    user: ${USERID}:${GROUPID}
+    command: tail -f /etc/hosts
