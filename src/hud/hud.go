@@ -7,6 +7,7 @@ import (
 	"github.com/severinraez/cotenoer/bundle"
 	"fmt"
 	"errors"
+	"strings"
 )
 
 
@@ -139,7 +140,7 @@ func teardownTermbox() {
 func draw(state state) {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-	bundles, bundlesW := linesToRect(bundleView(state.BundleOverviews))
+	bundles, bundlesW := bundleView(state.BundleOverviews)
 	if len(bundles) > 0 {
 		copyRect(backbuf, bbw, 5, 5, bundles, bundlesW)
 	}
@@ -151,14 +152,17 @@ func draw(state state) {
 	termbox.Flush()
 }
 
-func bundleView(bundles []bundle.Overview) []string {
+func bundleView(bundles []bundle.Overview) ([]termbox.Cell, int) {
 	view := []string{};
 	for i, bundle := range bundles {
-		view = append(
-			view,
-			fmt.Sprintf("%d %s - %d [_]", i, bundle.Name, bundle.ActiveContainers))
+		line2 := fmt.Sprintf("%d %s - %d [_]", i, bundle.Name, bundle.ActiveContainers)
+		// Add the container's top
+		line1 := fmt.Sprintf("%s_", strings.Repeat(" ", len(line2)-2))
+
+		view = append(view, line1)
+		view = append(view, line2)
 	}
-	return view
+	return linesToRect(view)
 }
 
 // @return ([]cells, width)
