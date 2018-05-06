@@ -172,10 +172,10 @@ func bundleView(bundles []bundle.Overview) ([]termbox.Cell, int) {
 		gridSet(fmt.Sprintf("%s  ", bundle.Name), nameColumn, top + 1, view)
 		gridSet(fmt.Sprintf("%d", bundle.ActiveContainers), containersColumn, top + 1, view)
 
-		gridSet(" _ ", containerSymbolColumn, top, view)
-		gridSet("[_]", containerSymbolColumn, top + 1, view)
+		gridSet(" _  ", containerSymbolColumn, top, view)
+		gridSet("[_] ", containerSymbolColumn, top + 1, view)
 
-		gridSet(" |   |", resourcesColumn, top + 1, view)
+		gridSet("|   |", resourcesColumn, top + 1, view)
 	}
 
 	return linesToRect(gridToLines(view))
