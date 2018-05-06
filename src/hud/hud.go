@@ -7,7 +7,6 @@ import (
 	"github.com/severinraez/cotenoer/bundle"
 	"fmt"
 	"errors"
-	"strings"
 )
 
 
@@ -153,16 +152,33 @@ func draw(state state) {
 }
 
 func bundleView(bundles []bundle.Overview) ([]termbox.Cell, int) {
-	view := []string{};
-	for i, bundle := range bundles {
-		line2 := fmt.Sprintf("%d %s - %d [_]", i, bundle.Name, bundle.ActiveContainers)
-		// Add the container's top
-		line1 := fmt.Sprintf("%s_", strings.Repeat(" ", len(line2)-2))
+	const(
+		numberColumn = iota
+		nameColumn = iota
+		containersColumn = iota
+		containerSymbolColumn = iota
+		resourcesColumn = iota
+		columnCount = iota
+	)
 
-		view = append(view, line1)
-		view = append(view, line2)
+	linesPerBundle := 2
+	columnSpacing := 1
+	view := gridMake(columnCount, len(bundles) * linesPerBundle, columnSpacing)
+
+	for i, bundle := range bundles {
+		top := i * linesPerBundle;
+
+		gridSet(fmt.Sprintf("%d", i + 1), numberColumn, top + 1, view)
+		gridSet(fmt.Sprintf("%s  ", bundle.Name), nameColumn, top + 1, view)
+		gridSet(fmt.Sprintf("%d", bundle.ActiveContainers), containersColumn, top + 1, view)
+
+		gridSet(" _ ", containerSymbolColumn, top, view)
+		gridSet("[_]", containerSymbolColumn, top + 1, view)
+
+		gridSet(" |   |", resourcesColumn, top + 1, view)
 	}
-	return linesToRect(view)
+
+	return linesToRect(gridToLines(view))
 }
 
 // @return ([]cells, width)
